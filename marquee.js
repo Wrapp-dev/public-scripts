@@ -2,7 +2,7 @@ $(document).ready(function () {
   // Default settings
   const defaultMarqueeSettings = {
     direction: 'left', // 'left' or 'right'
-    speed: 50, // Speed in pixels per second
+    speed: 100, // Speed in pixels per second
     pauseOnHover: false,
   };
 
@@ -20,27 +20,28 @@ $(document).ready(function () {
 
     const updateMarquee = () => {
       const marqueeWidth = marquee.outerWidth();
-      const contentWidth = marquee[0].scrollWidth;
+      let contentWidth = marquee[0].scrollWidth;
 
-      // Duplicate content to fill the screen width
-      const repeatCount = Math.ceil((marqueeWidth * 2) / contentWidth);
+      // Duplicate content to ensure seamless scrolling
       const originalContent = marquee.children().clone();
-      marquee.empty();
-      for (let i = 0; i < repeatCount; i++) {
+      while (contentWidth < marqueeWidth * 2) {
         marquee.append(originalContent.clone());
+        contentWidth = marquee[0].scrollWidth;
       }
 
-      // Set animation
-      const totalDistance = marquee[0].scrollWidth;
-      const duration = (totalDistance / settings.speed) * 1000; // Convert to milliseconds
+      // Update content width after duplication
+      const totalContentWidth = marquee[0].scrollWidth;
 
-      const animationDirection = settings.direction === 'left' ? '-=' : '+=');
+      // Set animation
+      const duration = (totalContentWidth / settings.speed) * 1000; // Convert to milliseconds
+
+      const animationDirection = settings.direction === 'left' ? '-' : '+';
       const keyframes = `@keyframes marquee {
         from {
           transform: translateX(0);
         }
         to {
-          transform: translateX(${animationDirection}${contentWidth}px);
+          transform: translateX(${animationDirection}${totalContentWidth / 2}px);
         }
       }`;
 
@@ -71,4 +72,3 @@ $(document).ready(function () {
     $(window).on('resize', updateMarquee);
   });
 });
-
