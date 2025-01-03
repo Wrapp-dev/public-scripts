@@ -3,7 +3,7 @@ $(document).ready(function () {
   const defaultMarqueeSettings = {
     direction: 'left', // 'left' or 'right'
     speed: 50, // Speed in pixels per second
-    pauseOnHover: true,
+    pauseOnHover: false,
   };
 
   // Initialize marquee
@@ -15,7 +15,7 @@ $(document).ready(function () {
       ...defaultMarqueeSettings,
       direction: marquee.data('wr-direction') || defaultMarqueeSettings.direction,
       speed: parseFloat(marquee.data('wr-speed')) || defaultMarqueeSettings.speed,
-      pauseOnHover: marquee.data('wr-pause-on-hover') !== undefined ? marquee.data('wr-pause-on-hover') : defaultMarqueeSettings.pauseOnHover,
+      pauseOnHover: marquee.data('wr-pause-on-hover') !== undefined ? true : defaultMarqueeSettings.pauseOnHover,
     };
 
     const updateMarquee = () => {
@@ -71,3 +71,4 @@ $(document).ready(function () {
     $(window).on('resize', updateMarquee);
   });
 });
+
