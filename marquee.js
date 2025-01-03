@@ -10,6 +10,9 @@ $(document).ready(function () {
   $('[data-wr-marquee]').each(function () {
     const marquee = $(this);
 
+    // Generate a unique ID for each marquee
+    const uniqueId = `marquee-${Math.random().toString(36).substr(2, 9)}`;
+
     // Merge default settings with data attributes
     const settings = {
       ...defaultMarqueeSettings,
@@ -18,49 +21,69 @@ $(document).ready(function () {
       pauseOnHover: marquee.data('wr-pause-on-hover') !== undefined ? true : defaultMarqueeSettings.pauseOnHover,
     };
 
+    const animationDirection = settings.direction === 'left' ? '-' : '';
+    const interactions = marquee.data('wr-interactions') !== undefined ? true : false;
+
+    // Wrap content in an inner container
+    const innerContainer = $('<div class="marquee-inner"></div>');
+    innerContainer.append(marquee.children().clone(true));
+    marquee.empty().append(innerContainer);
+
+    marquee.css({
+      display: 'flex',
+      overflow: 'hidden',
+    });
+
+    innerContainer.css({
+      display: 'flex',
+      gap: `${parseFloat(marquee.css('gap')) || 0}px`, // Include gap
+      width: 'max-content',
+    });
+
     const updateMarquee = () => {
       const marqueeWidth = marquee.outerWidth();
-      let contentWidth = marquee[0].scrollWidth;
+      let contentWidth = innerContainer[0].scrollWidth;
 
       // Duplicate content to ensure seamless scrolling
-      const originalContent = marquee.children().clone();
       while (contentWidth < marqueeWidth * 2) {
-        marquee.append(originalContent.clone());
-        contentWidth = marquee[0].scrollWidth;
+        innerContainer.append(innerContainer.children().clone(true));
+        contentWidth = innerContainer[0].scrollWidth;
       }
 
+      // Restart Webflow interactions
+      if (interactions) Webflow.require('ix2').init();
+
       // Update content width after duplication
-      const totalContentWidth = marquee[0].scrollWidth;
+      const totalContentWidth = innerContainer[0].scrollWidth;
 
       // Set animation
       const duration = (totalContentWidth / settings.speed) * 1000; // Convert to milliseconds
 
-      const animationDirection = settings.direction === 'left' ? '-' : '+';
-      const keyframes = `@keyframes marquee {
+      const keyframes = `@keyframes ${uniqueId} {
         from {
-          transform: translateX(0);
+          transform: translateX(${settings.direction === 'left' ? 0 : -totalContentWidth / 2}px);
         }
         to {
-          transform: translateX(${animationDirection}${totalContentWidth / 2}px);
+          transform: translateX(${settings.direction === 'left' ? -totalContentWidth / 2 : 0}px);
         }
       }`;
 
       // Inject keyframes into a style tag
-      const styleTag = $('<style></style>').text(keyframes);
+      const styleTag = $(`<style id="${uniqueId}-style"></style>`).text(keyframes);
+      $(`head #${uniqueId}-style`).remove(); // Remove existing styles to prevent duplication
       $('head').append(styleTag);
 
-      marquee.css({
-        display: 'flex',
-        animation: `marquee ${duration}ms linear infinite`,
+      innerContainer.css({
+        animation: `${uniqueId} ${duration}ms linear infinite`,
       });
 
       // Pause on hover
       if (settings.pauseOnHover) {
         marquee.on('mouseenter', function () {
-          marquee.css('animation-play-state', 'paused');
+          innerContainer.css('animation-play-state', 'paused');
         });
         marquee.on('mouseleave', function () {
-          marquee.css('animation-play-state', 'running');
+          innerContainer.css('animation-play-state', 'running');
         });
       }
     };
