@@ -61,10 +61,10 @@ $(document).ready(function () {
 
       const keyframes = `@keyframes ${uniqueId} {
         from {
-          transform: translateX(${settings.direction} === 'left' ? 0 : -totalContentWidth / 2}px);
+          transform: translateX(${settings.direction === 'left' ? 0 : -totalContentWidth / 2}px);
         }
         to {
-          transform: translateX(${settings.direction} === 'left' ? -totalContentWidth / 2 : 0}px);
+          transform: translateX(${settings.direction === 'left' ? -totalContentWidth / 2 : 0}px);
         }
       }`;
 
@@ -95,3 +95,4 @@ $(document).ready(function () {
     $(window).on('resize', updateMarquee);
   });
 });
+
