@@ -34,15 +34,15 @@ $(document).ready(function () {
       overflow: 'hidden',
     });
 
-    innerContainer.css({
-      display: 'flex',
-      gap: `${parseFloat(marquee.css('gap')) || 0}px`, // Include gap
-      width: 'max-content',
-    });
-
     const updateMarquee = () => {
       const marqueeWidth = marquee.outerWidth();
       let contentWidth = innerContainer[0].scrollWidth;
+
+      innerContainer.css({
+        display: 'flex',
+        gap: `${parseFloat(marquee.css('gap')) || 0}px`,
+        width: 'max-content',
+      });
 
       // Duplicate content to ensure seamless scrolling
       while (contentWidth < marqueeWidth * 2) {
